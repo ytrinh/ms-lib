@@ -37,7 +37,6 @@ func init() {
 }
 
 // NewGRPCTransport
-//func NewGRPCTransport(addr string, logPayload bool, decider grpc_logging.ServerPayloadLoggingDecider) (*GRPCTransport, error) {
 func NewGRPCTransport(opts *GRPCTransportOptions) (*GRPCTransport, error) {
     logger := log.WithField("module", "GRPCTransport")
     //l := logger.WithField("function", "NewGRPCTransport")
