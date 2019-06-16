@@ -39,7 +39,6 @@ func init() {
 // NewGRPCTransport
 func NewGRPCTransport(opts *GRPCTransportOptions) (*GRPCTransport, error) {
     logger := log.WithField("module", "GRPCTransport")
-    //l := logger.WithField("function", "NewGRPCTransport")
 
     grpcTransport := GRPCTransport{
         Logger:     logger,
