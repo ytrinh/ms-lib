@@ -12,14 +12,14 @@ import (
 type HTTPTransport struct {
 	Logger  *log.Entry
 	Addr    string
-	Handler *http.Handler
+	Handler http.Handler
 	Closers []io.Closer
 }
 
 // GRPCTransportOptions hold options for server
 type HTTPTransportOptions struct {
 	Addr    string
-	Handler *http.Handler
+	Handler http.Handler
 }
 
 // NewServer creates a new http transport
@@ -41,11 +41,6 @@ func NewHTTPTransport(opts *HTTPTransportOptions) (*HTTPTransport, error) {
 	}, nil
 }
 
-// ServeMux
-func (t *HTTPTransport) ServeHandler() *http.Handler {
-	return t.Handler
-}
-
 // Add
 func (t *HTTPTransport) Add(c io.Closer) {
 	t.Closers = append(t.Closers, c)
@@ -57,7 +52,7 @@ func (t *HTTPTransport) Run() error {
 
 	l.WithField("addr", t.Addr).Info("listening")
 
-	return http.ListenAndServe(t.Addr, *t.Handler)
+	return http.ListenAndServe(t.Addr, t.Handler)
 }
 
 // Close
