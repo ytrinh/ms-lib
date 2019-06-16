@@ -3,70 +3,72 @@ package ms
 import (
 	"errors"
 	"io"
-    "net/http"
+	"net/http"
 
-    log "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // HTTPTransport
 type HTTPTransport struct {
-    Logger  *log.Entry
-    Addr    string
-    Mux     *http.ServeMux
-    Closers []io.Closer
+	Logger  *log.Entry
+	Addr    string
+	Handler *http.Handler
+	Closers []io.Closer
 }
+
 // GRPCTransportOptions hold options for server
 type HTTPTransportOptions struct {
-	Addr string
-	Mux  *http.ServeMux
+	Addr    string
+	Handler *http.Handler
 }
+
 // NewServer creates a new http transport
 func NewHTTPTransport(opts *HTTPTransportOptions) (*HTTPTransport, error) {
 	logger := log.WithField("module", "HTTPTransport")
-	
+
 	if opts == nil {
 		return nil, errors.New("missing HTTPTransportOptions")
 	}
 
-	if opts.Mux == nil {
-		opts.Mux = http.NewServeMux()
+	if opts.Handler == nil {
+		return nil, errors.New("missing handler")
 	}
 
-    return &HTTPTransport{
-        Logger: logger,
-        Addr:   opts.Addr,
-        Mux:    opts.Mux,
-    }, nil
+	return &HTTPTransport{
+		Logger:  logger,
+		Addr:    opts.Addr,
+		Handler: opts.Handler,
+	}, nil
 }
 
 // ServeMux
-func (t *HTTPTransport) ServeMux() *http.ServeMux {
-    return t.Mux
+func (t *HTTPTransport) ServeHandler() *http.Handler {
+	return t.Handler
 }
 
 // Add
 func (t *HTTPTransport) Add(c io.Closer) {
-    t.Closers = append(t.Closers, c)
+	t.Closers = append(t.Closers, c)
 }
 
 // Run
 func (t *HTTPTransport) Run() error {
-    l := t.Logger.WithField("function", "Run")
+	l := t.Logger.WithField("function", "Run")
 
-    l.WithField("addr", t.Addr).Info("listening")
+	l.WithField("addr", t.Addr).Info("listening")
 
-    return http.ListenAndServe(t.Addr, t.Mux)
+	return http.ListenAndServe(t.Addr, *t.Handler)
 }
 
 // Close
 func (t *HTTPTransport) Close() error {
-    l := t.Logger.WithField("function", "Close")
+	l := t.Logger.WithField("function", "Close")
 
-    for _, v := range t.Closers {
-        if err := v.Close(); err != nil {
-            l.WithField("err", err).Error()
-        }
-    }
+	for _, v := range t.Closers {
+		if err := v.Close(); err != nil {
+			l.WithField("err", err).Error()
+		}
+	}
 
-    return nil
+	return nil
 }

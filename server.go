@@ -22,7 +22,7 @@ type Runner interface {
 type Server struct {
 	logger  *log.Entry
 	runners []Runner
-	options  *ServerOptions
+	options *ServerOptions
 }
 
 // ServerOptions hold options for server
@@ -50,7 +50,7 @@ func NewServer(opts *ServerOptions) (*Server, error) {
 	}, nil
 }
 
-// Add a runner 
+// Add a runner
 func (s *Server) Add(runner Runner) {
 	if runner == nil {
 		return
@@ -90,7 +90,7 @@ func (s *Server) Run() error {
 	return err
 }
 
-// Close manages server and runners shutdown by calling any 
+// Close manages server and runners shutdown by calling any
 // runners with Close() interface and wait return or timeout.
 func (s *Server) Close() error {
 	l := s.logger.WithField("function", "Close")
