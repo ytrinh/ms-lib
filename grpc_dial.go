@@ -11,6 +11,10 @@ import (
 // GRPCDial is a helper function that creates a grpc.ClientConn with
 // logging and prometheus interecepters
 func GRPCDial(url string, entry *logrus.Entry) (*grpc.ClientConn, error) {
+	if entry == nil {
+		entry = logrus.WithField("function", "GRPCDial")
+	}
+
 	opts := []grpc_logrus.Option{
 		grpc_logrus.WithLevels(grpc_logrus.DefaultClientCodeToLevel),
 	}
