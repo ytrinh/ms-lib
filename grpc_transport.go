@@ -141,7 +141,7 @@ func (t *GRPCTransport) recover() grpc_recovery.RecoveryHandlerFuncContext {
 			"function": "recover",
 			"ctx":      ctx,
 			"panic":    p,
-		}).Error(debug.Stack())
+		}).Error(string(debug.Stack()))
 
 		return errors.New("recovery error")
 	}
